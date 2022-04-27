@@ -1,0 +1,7 @@
+django
+psycopg2
+django-ckeditor
+django-crispy-forms
+django-recaptcha
+django-cleanup
+Pillow
