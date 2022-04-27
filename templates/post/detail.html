@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} - {{ block.super }}{% endblock %}
+{% block body %}
+
+    <div class="container">
+        <div class="card mb-3 col-md-6 col-md-offset-3">
+            <div class="card-body">
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-thumbnail">
+                {% endif %}
+                <h3 class="card-title">{{ post.title }}</h3>
+                <a href="/account/profile/{{ post.user }}"><small>Author: {{ post.user }}</small></a>
+                <p class="card-text">{{ post.content|safe }}</p>
+                <p class="card-text"><small class="text-muted">{{ post.publishing_Date }}</small></p>
+                {% if request.user.is_authenticated and request.user == post.user or request.user.is_staff %}
+                    <a href="{{ post.get_update_url }}" class="btn btn-sm btn-outline-info">Update</a>
+                    <!-- Button trigger modal -->
+                    <a class="btn btn-sm btn-danger" href="#" data-bs-toggle="modal"
+                       data-bs-target="#deleteModal">Delete</a>
+                    <a href="{{ post.get_disable_url }}" class="btn btn-sm btn-danger">Disable for comments</a>
+                {% endif %}
+                <!-- Modal -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                </button>
+                                <a href="{{ post.get_delete_url }}" class="btn btn-primary">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 col-md-6 col-md-offset-3">
+            <br>
+            <br><br>
+            <hr>
+            {% if not post.is_disabled %}
+                {% if request.user.is_authenticated %}
+                    <h3>Add Comment</h3>
+                    {% include 'post/comment.html' %}
+                    <hr><br>
+                {% else %}
+                    <h3><small>Sign in to post a comment</small></h3>
+                    <hr><br>
+                {% endif %}
+            {% endif %}
+            {% for comment in post.comments.all %}
+                <h3><a href="/account/profile/{{ comment.user }}"
+                       style="text-align: left; float: left;">{{ comment.user }}</a></h3>
+                <h6 style="text-align: right; float: right;"><small>  {{ comment.created_Date|timesince }}
+                    ago</small></h6>
+                <h2 style="clear: both;"></h2>
+                <p>{{ comment.content|safe }}</p>
+                {% if request.user.is_authenticated and request.user == comment.user or request.user.is_staff %}
+                    <form action="" method="get">
+                        <button href="{{ post.get_absolute_url }}" name="commentUpdate" type="submit" value="{{ comment.id }}"
+                                class="btn btn-sm btn-info">Update</button>
+                        <button href="{{ post.get_absolute_url }}" name="commentDelete" type="submit"
+                                value="{{ comment.id }}"
+                                class="btn btn-sm btn-danger">Delete
+                        </button>
+                    </form>
+                {% endif %}
+                <hr>
+            {% endfor %}
+
+        </div>
+    </div>
+
+{% endblock %}

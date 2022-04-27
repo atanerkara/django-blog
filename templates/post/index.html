@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Posts - {{ block.super }}{% endblock %}
+{% block body %}
+
+    <div class="container">
+        {% for post in posts %}
+            <div class="card mb-3 col-md-6 col-md-offset-3">
+                <div class="card-body">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-thumbnail">
+                    {% endif %}
+                    <h3 class="card-title">{{ post.title }}</h3>
+                    <a href="/account/profile/{{ post.user }}"><small>Author: {{ post.user }}</small></a>
+                    <p class="card-text">{{ post.content|safe|linebreaks|truncatechars:150 }}</p>
+                    <p class="card-text"><small class="text-muted">{{ post.publishing_Date }}</small></p>
+                    <a href="{{ post.get_absolute_url }}" class="btn btn-sm btn-primary">Details</a>
+                    {% if request.user.is_authenticated and request.user == post.user or request.user.is_staff %}
+                        <a href="{{ post.get_update_url }}" class="btn btn-sm btn-outline-info">Update</a>
+                        <a href="{{ post.get_delete_url }}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{{ post.get_disable_url }}" class="btn btn-sm btn-danger">Disable for comments</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        <nav aria-label="...">
+            <ul class="pagination">
+                {% if  posts.has_previous %}
+                    <a class="page-link" href="?page=1" tabindex="-1">First</a>
+                    </li>
+                    <li class="page-item"><a class="page-link"
+                                             href="?page={{ posts.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ posts.previous_page_number }}</a>
+                    </li>
+                {% endif %}
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{ posts.number }} <span class="sr-only"></span></a>
+                </li>
+                {% if posts.has_next %}
+                    <li class="page-item"><a class="page-link"
+                                             href="?page={{ posts.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ posts.next_page_number }}</a></li>
+                    <a class="page-link" href="?page={{ posts.paginator.num_pages }}">Last</a>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+{% endblock %}

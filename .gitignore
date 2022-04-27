@@ -1,0 +1,6 @@
+venv/*
+media/*
+static/*
+staticfiles/*
+.idea/*
+
